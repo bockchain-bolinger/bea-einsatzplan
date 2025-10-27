@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bea-Betreuung Einsatzplan</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+        
+        body.light { background: linear-gradient(135deg, #f0f9fa 0%, #e0f2f1 100%); color: #333; }
+        body.dark { background: #1a1a1a; color: #fff; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 1rem; }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        h1 { font-size: 2rem; }
+        .subtitle { color: #16a085; font-weight: 600; }
+        
+        .header-controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        button, input, select {
+            padding: 0.5rem 1rem;
+            background: #16a085;
+            color: white;
+            border: none;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        
+        button:hover { background: #0d7e6a; }
+        
+        input, select {
+            background: white;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+        }
+        
+        body.dark input, body.dark select {
+            background: #2a2a2a;
+            color: white;
+            border-color: #555;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 0.4rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #16a085;
+            color: #333;
+        }
+        
+        body.dark .stat-card { background: #2a2a2a; color: white; }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #333;
+        }
+        
+        body.dark .tab-btn { background: #2a2a2a; border-color: #444; color: white; }
+        .tab-btn.active { background: #16a085; color: white; border-color: #16a085; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .card {
+            background: white;
+            border-radius: 0.4rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        
+        body.dark .card { background: #2a2a2a; color: white; }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        thead { background: #e0f2f1; }
+        body.dark thead { background: #3a3a3a; }
+        
+        th {
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #16a085;
+        }
+        
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        body.dark td { border-bottom-color: #444; }
+        
+        tr:hover { background: #f5f5f5; }
+        body.dark tr:hover { background: #333; }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.3rem;
+            margin: 1rem 0;
+        }
+        
+        .cal-day-header {
+            text-align: center;
+            font-weight: bold;
+            color: #16a085;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .cal-day {
+            min-height: 80px;
+            border: 1px solid #ccc;
+            border-radius: 0.3rem;
+            padding: 0.3rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            font-size: 0.8rem;
+            overflow-y: auto;
+            max-height: 120px;
+            background: white;
+            color: #333;
+        }
+        
+        body.dark .cal-day { border-color: #555; background: #2a2a2a; color: white; }
+        .cal-day:hover { border-color: #16a085; }
+        
+        .cal-date { font-weight: bold; margin-bottom: 0.2rem; }
+        
+        .shift-item {
+            font-size: 0.7rem;
+            padding: 0.2rem;
+            border-radius: 0.2rem;
+            margin-bottom: 0.1rem;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .shift-early { background: #d4edff; color: #0047b3; }
+        .shift-spät { background: #ffe4cc; color: #cc6600; }
+        .shift-nacht { background: #e8d4f5; color: #6b0095; }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 0.75rem;
+            border-radius: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+            padding: 0.75rem;
+            border-radius: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-small {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.4rem;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: #333;
+        }
+        
+        body.dark .modal-content { background: #2a2a2a; color: white; }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            float: right;
+            color: #333;
+        }
+        
+        body.dark .close-btn { color: white; }
+        
+        .filter-section {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #16a085;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.8rem;
+            margin-right: 0.3rem;
+        }
+        
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chart-bar-fill {
+            height: 25px;
+            background: #16a085;
+            border-radius: 0.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 0.5rem; }
+            h1 { font-size: 1.5rem; }
+            .calendar { grid-template-columns: repeat(7, 1fr); gap: 0.2rem; }
+            .cal-day { min-height: 60px; font-size: 0.7rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr; }
+            button, input, select { font-size: 0.85rem; padding: 0.4rem 0.8rem; }
+        }
+    </style>
+</head>
+<body class="light">
+    <div class="container">
+        <header>
+            <div>
+                <h1>Bea-Betreuung Einsatzplan</h1>
+                <p class="subtitle">Erweiterte Verwaltung & Schichtplanung</p>
+            </div>
+            <div class="header-controls">
+                <button onclick="toggleDarkMode()">🌙</button>
+                <button onclick="openUserModal()">👤 Benutzer</button>
+                <button onclick="openBackupModal()">💾 Backup</button>
+            </div>
+        </header>
+
+        <div class="stats" id="statsContainer"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('calendar')">📅 Kalender</button>
+            <button class="tab-btn" onclick="switchTab('employees')">👥 Mitarbeiter</button>
+            <button class="tab-btn" onclick="switchTab('teams')">👨‍💼 Teams</button>
+            <button class="tab-btn" onclick="switchTab('vacations')">🖐️ Urlaub</button>
+            <button class="tab-btn" onclick="switchTab('templates')">📋 Vorlagen</button>
+            <button class="tab-btn" onclick="switchTab('requests')">💬 Tausch-Anfragen</button>
+            <button class="tab-btn" onclick="switchTab('reports')">📊 Berichte</button>
+            <button class="tab-btn" onclick="switchTab('history')">📜 Historie</button>
+        </div>
+
+        <div id="calendar" class="tab-content active">
+            <div class="card">
+                <h2>Schichtplanung</h2>
+                <div class="filter-section">
+                    <input type="month" id="monthFilter" value="2025-10" onchange="updateCalendar()">
+                    <select id="deptFilter" onchange="updateCalendar()">
+                        <option value="">Alle Abteilungen</option>
+                    </select>
+                    <button onclick="exportCSV()">⬇️ CSV Export</button>
+                    <button onclick="openImportModal()">⬆️ CSV Import</button>
+                </div>
+                <div id="calendarGrid" class="calendar"></div>
+                <div class="form-grid" style="margin-top: 1.5rem; border-top: 1px solid #ccc; padding-top: 1rem;">
+                    <input type="date" id="newShiftDate">
+                    <select id="newShiftEmployee"></select>
+                    <select id="newShiftType">
+                        <option value="Früh">Früh</option>
+                        <option value="Spät">Spät</option>
+                        <option value="Nacht">Nacht</option>
+                    </select>
+                    <button onclick="addShift()">➕ Hinzufügen</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="employees" class="tab-content">
+            <div class="card">
+                <h2>Neuer Mitarbeiter</h2>
+                <div class="form-grid">
+                    <input type="text" id="empName" placeholder="Name">
+                    <input type="text" id="empRole" placeholder="Rolle">
+                    <select id="empDept">
+                        <option value="">Abteilung</option>
+                        <option value="IT">IT</option>
+                        <option value="HR">HR</option>
+                        <option value="Vertrieb">Vertrieb</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                    <input type="text" id="empAvail" placeholder="Verfügbarkeit (z.B. Mo-Fr 8-17)">
+                    <input type="text" id="empQual" placeholder="Qualifikationen (komma-getrennt)">
+                    <select id="empRole2">
+                        <option value="Mitarbeiter">Mitarbeiter</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <button onclick="addEmployee()">➕ Hinzufügen</button>
+            </div>
+
+            <div class="card">
+                <h2>Mitarbeiter</h2>
+                <div class="filter-section">
+                    <input type="text" id="empSearch" placeholder="Suche..." onkeyup="filterEmployees()">
+                    <select id="empDeptFilter" onchange="filterEmployees()">
+                        <option value="">Alle Abteilungen</option>
+                    </select>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Rolle</th>
+                            <th>Abteilung</th>
+                            <th>Qualifikationen</th>
+                            <th>Verfügbarkeit</th>
+                            <th>Schichten</th>
+                            <th>Stunden</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="teams" class="tab-content">
+            <div class="card">
+                <h2>Abteilungsübersicht</h2>
+                <div id="teamsList"></div>
+            </div>
+        </div>
+
+        <div id="vacations" class="tab-content">
+            <div class="card">
+                <h2>Urlaub hinzufügen</h2>
+                <div class="form-grid">
+                    <select id="vacEmployee"></select>
+                    <input type="date" id="vacStart">
+                    <input type="date" id="vacEnd">
+                </div>
+                <button onclick="addVacation()">➕ Urlaub hinzufügen</button>
+            </div>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mitarbeiter</th>
+                            <th>Von</th>
+                            <th>Bis</th>
+                            <th>Tage</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vacationTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="templates" class="tab-content">
+            <div class="card">
+                <h2>Schicht-Vorlage erstellen</h2>
+                <div class="form-grid">
+                    <input type="text" id="templateName" placeholder="Vorlagenname">
+                    <select id="templateFreq">
+                        <option value="weekly">Wöchentlich</option>
+                        <option value="biweekly">Bi-wöchentlich</option>
+                        <option value="monthly">Monatlich</option>
+                    </select>
+                </div>
+                <button onclick="addTemplate()">➕ Vorlage erstellen</button>
+                <h3 style="margin-top: 1.5rem;">Schicht-Vorlage:</h3>
+                <div id="templateEditor" class="form-grid"></div>
+                <button onclick="saveTemplate()" style="margin-top: 1rem;">💾 Speichern</button>
+            </div>
+
+            <div class="card">
+                <h2>Existierende Vorlagen</h2>
+                <div id="templatesList"></div>
+            </div>
+        </div>
+
+        <div id="requests" class="tab-content">
+            <div class="card">
+                <h2>Schicht-Tausch-Anfragen</h2>
+                <div id="requestsList"></div>
+            </div>
+        </div>
+
+        <div id="reports" class="tab-content">
+            <div class="card">
+                <h2>Schichten pro Mitarbeiter</h2>
+                <div id="statsEmployee"></div>
+            </div>
+
+            <div class="card">
+                <h2>Überbelastung (>40h/Woche)</h2>
+                <div id="overloadList"></div>
+            </div>
+
+            <div class="card">
+                <h2>Schichten pro Typ</h2>
+                <div id="statsShifts"></div>
+            </div>
+
+            <div class="card">
+                <h2>Skill-Matrix</h2>
+                <div id="skillMatrix"></div>
+            </div>
+
+            <div class="card">
+                <h2>Trend-Analysen</h2>
+                <div id="trends"></div>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content">
+            <div class="card">
+                <h2>Änderungsverlauf</h2>
+                <button onclick="clearHistory()">🗑️ Historie löschen</button>
+                <table style="margin-top: 1rem;">
+                    <thead>
+                        <tr>
+                            <th>Zeitstempel</th>
+                            <th>Benutzer</th>
+                            <th>Aktion</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('userModal')">✕</button>
+            <h2>Benutzer-Verwaltung</h2>
+            <div class="form-grid" style="margin-top: 1rem;">
+                <input type="text" id="userName" placeholder="Benutzername">
+                <select id="userRole">
+                    <option value="Mitarbeiter">Mitarbeiter</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+            <button onclick="addUser()">➕ Benutzer hinzufügen</button>
+            <div id="userList" style="margin-top: 1.5rem;"></div>
+        </div>
+    </div>
+
+    <div id="backupModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('backupModal')">✕</button>
+            <h2>Backup & Restore</h2>
+            <button onclick="createBackup()">💾 Backup erstellen</button>
+            <button onclick="document.getElementById('restoreFile').click()">📂 Backup laden</button>
+            <input type="file" id="restoreFile" accept=".json" onchange="restoreBackup(event)" style="display: none;">
+            <div id="backupInfo" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('importModal')">✕</button>
+            <h2>CSV Importieren</h2>
+            <input type="file" id="csvFile" accept=".csv" onchange="handleCSVImport(event)">
+            <button onclick="document.getElementById('csvFile').click()">📂 Datei wählen</button>
+        </div>
+    </div>
+
+    <script>
+        let employees = JSON.parse(localStorage.getItem('employees')) || [
+            { id: 1, name: 'Max Müller', role: 'Betreuer', dept: 'IT', qual: ['JavaScript', 'React'], avail: 'Mo-Fr 8-17', userRole: 'Mitarbeiter' },
+            { id: 2, name: 'Anna Schmidt', role: 'Betreuer', dept: 'IT', qual: ['UI/UX'], avail: 'Mo-Fr 9-18', userRole: 'Mitarbeiter' }
+        ];
+        let schedules = JSON.parse(localStorage.getItem('schedules')) || [
+            { id: 1, date: '2025-10-25', empId: 1, shift: 'Früh' },
+            { id: 2, date: '2025-10-25', empId: 2, shift: 'Spät' }
+        ];
+        let vacations = JSON.parse(localStorage.getItem('vacations')) || [];
+        let templates = JSON.parse(localStorage.getItem('templates')) || [];
+        let requests = JSON.parse(localStorage.getItem('requests')) || [];
+        let users = JSON.parse(localStorage.getItem('users')) || [
+            { id: 1, name: 'Admin User', role: 'Admin' }
+        ];
+        let history = JSON.parse(localStorage.getItem('history')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || users[0];
+
+        function saveData() {
+            localStorage.setItem('employees', JSON.stringify(employees));
+            localStorage.setItem('schedules', JSON.stringify(schedules));
+            localStorage.setItem('vacations', JSON.stringify(vacations));
+            localStorage.setItem('templates', JSON.stringify(templates));
+            localStorage.setItem('requests', JSON.stringify(requests));
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('history', JSON.stringify(history));
+        }
+
+        function addToHistory(action, details) {
+            history.push({
+                timestamp: new Date().toISOString(),
+                user: currentUser.name,
+                action,
+                details
+            });
+            if (history.length > 500) history.shift();
+            saveData();
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            document.body.classList.toggle('light');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tab === 'employees') { updateEmployeeTable(); updateFilters(); }
+            if (tab === 'calendar') updateCalendar();
+            if (tab === 'vacations') { updateVacationTable(); updateVacationSelect(); }
+            if (tab === 'teams') updateTeams();
+            if (tab === 'templates') updateTemplates();
+            if (tab === 'requests') updateRequests();
+            if (tab === 'reports') updateReports();
+            if (tab === 'history') updateHistory();
+            updateStats();
+        }
+
+        function updateStats() {
+            const html = `
+                <div class="stat-card"><strong>Mitarbeiter:</strong> ${employees.length}</div>
+                <div class="stat-card"><strong>Schichten:</strong> ${schedules.length}</div>
+                <div class="stat-card"><strong>Urlaube:</strong> ${vacations.length}</div>
+                <div class="stat-card"><strong>Tausch-Anfragen:</strong> ${requests.filter(r => r.status === 'pending').length}</div>
+                <div class="stat-card"><strong>Benutzer:</strong> ${users.length}</div>
+            `;
+            document.getElementById('statsContainer').innerHTML = html;
+        }
+
+        function addEmployee() {
+            const name = document.getElementById('empName').value;
+            const role = document.getElementById('empRole').value;
+            const dept = document.getElementById('empDept').value;
+            const avail = document.getElementById('empAvail').value;
+            const qual = document.getElementById('empQual').value.split(',').map(q => q.trim()).filter(q => q);
+            const userRole = document.getElementById('empRole2').value;
+
+            if (!name || !role || !dept) { alert('Bitte alle Felder ausfüllen'); return; }
+
+            employees.push({ id: Date.now(), name, role, dept, qual, avail, userRole });
+            addToHistory('Mitarbeiter hinzugefügt', `${name} - ${role}`);
+            saveData();
+
+            document.getElementById('empName').value = '';
+            document.getElementById('empRole').value = '';
+            document.getElementById('empQual').value = '';
+            document.getElementById('empAvail').value = '';
+
+            updateEmployeeTable();
+            updateEmployeeSelects();
+            updateStats();
+        }
+
+        function deleteEmployee(id) {
+            employees = employees.filter(e => e.id !== id);
+            addToHistory('Mitarbeiter gelöscht', id);
+            saveData();
+            updateEmployeeTable();
+            updateEmployeeSelects();
+            updateStats();
+        }
+
+        function updateEmployeeTable() {
+            const filtered = employees.filter(e => {
+                const search = document.getElementById('empSearch')?.value.toLowerCase() || '';
+                const dept = document.getElementById('empDeptFilter')?.value || '';
+                return (e.name.toLowerCase().includes(search) || e.role.toLowerCase().includes(search)) &&
+                       (dept === '' || e.dept === dept);
+            });
+
+            const tbody = document.getElementById('employeeTable');
+            tbody.innerHTML = filtered.map(e => {
+                const shifts = schedules.filter(s => s.empId === e.id).length;
+                const hours = shifts * 8;
+                return `
+                    <tr>
+                        <td>${e.name}</td>
+                        <td>${e.role}</td>
+                        <td>${e.dept}</td>
+                        <td>${e.qual.join(', ')}</td>
+                        <td>${e.avail}</td>
+                        <td><span class="badge">${shifts}</span></td>
+                        <td><span class="badge">${hours}h</span></td>
+                        <td><button class="btn-small btn-danger" onclick="deleteEmployee(${e.id})">🗑️</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterEmployees() {
+            updateEmployeeTable();
+        }
+
+        function updateEmployeeSelects() {
+            ['newShiftEmployee', 'vacEmployee'].forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = '<option value="">Mitarbeiter</option>';
+                employees.forEach(e => {
+                    select.innerHTML += `<option value="${e.id}">${e.name}</option>`;
+                });
+            });
+        }
+
+        function updateFilters() {
+            const depts = [...new Set(employees.map(e => e.dept))];
+            document.getElementById('empDeptFilter').innerHTML = '<option value="">Alle</option>' +
+                depts.map(d => `<option value="${d}">${d}</option>`).join('');
+            document.getElementById('deptFilter').innerHTML = '<option value="">Alle</option>' +
+                depts.map(d => `<option value="${d}">${d}</option>`).join('');
+        }
+
+        function addShift() {
+            const date = document.getElementById('newShiftDate').value;
+            const empId = parseInt(document.getElementById('newShiftEmployee').value);
+            const shift = document.getElementById('newShiftType').value;
+
+            if (!date || !empId) { alert('Bitte alle Felder ausfüllen'); return; }
+            if (schedules.some(s => s.date === date && s.empId === empId)) {
+                alert('Konflikt: Doppelbuchung!');
+                return;
+            }
+            if (vacations.some(v => v.empId === empId && date >= v.start && date <= v.end)) {
+                alert('Fehler: Mitarbeiter ist in Urlaub!');
+                return;
+            }
+
+            schedules.push({ id: Date.now(), date, empId, shift });
+            addToHistory('Schicht hinzugefügt', `${getEmployeeName(empId)} - ${date}`);
+            saveData();
+
+            document.getElementById('newShiftDate').value = '';
+            document.getElementById('newShiftEmployee').value = '';
+            updateCalendar();
+            updateStats();
+        }
+
+        function deleteShift(id) {
+            schedules = schedules.filter(s => s.id !== id);
+            addToHistory('Schicht gelöscht', id);
+            saveData();
+            updateCalendar();
+            updateStats();
+        }
+
+        function getEmployeeName(id) {
+            return employees.find(e => e.id == id)?.name || 'Unbekannt';
+        }
+
+        function updateCalendar() {
+            const month = document.getElementById('monthFilter').value;
+            const [year, monthNum] = month.split('-').map(Number);
+            const firstDay = new Date(year, monthNum - 1, 1).getDay();
+            const daysInMonth = new Date(year, monthNum, 0).getDate();
+            const deptFilter = document.getElementById('deptFilter').value;
+
+            let html = '';
+            ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].forEach(day => {
+                html += `<div class="cal-day-header">${day}</div>`;
+            });
+
+            for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
+                html += '<div class="cal-day" style="background: #f5f5f5;"></div>';
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                let daySchedules = schedules.filter(s => s.date === date);
+                if (deptFilter) {
+                    daySchedules = daySchedules.filter(s => employees.find(e => e.id === s.empId)?.dept === deptFilter);
+                }
+                html += `
+                    <div class="cal-day" onclick="selectDate('${date}')">
+                        <div class="cal-date">${day}</div>
+                        ${daySchedules.map(s => `
+                            <div class="shift-item shift-${s.shift.toLowerCase()}" draggable="true" 
+                                ondragstart="dragStart(event, ${s.id})" 
+                                ondrop="dragDrop(event, '${date}')" 
+                                ondragover="dragOver(event)"
+                                onclick="deleteShift(${s.id}); event.stopPropagation();">
+                                ${getEmployeeName(s.empId)} - ${s.shift}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+
+        function selectDate(date) {
+            document.getElementById('newShiftDate').value = date;
+        }
+
+        let draggedShiftId = null;
+        function dragStart(e, id) {
+            draggedShiftId = id;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function dragDrop(e, date) {
+            e.preventDefault();
+            if (draggedShiftId) {
+                const shift = schedules.find(s => s.id === draggedShiftId);
+                if (shift) {
+                    shift.date = date;
+                    addToHistory('Schicht verschoben', `${getEmployeeName(shift.empId)} zu ${date}`);
+                    saveData();
+                    updateCalendar();
+                }
+            }
+        }
+
+        function addVacation() {
+            const empId = parseInt(document.getElementById('vacEmployee').value);
+            const start = document.getElementById('vacStart').value;
+            const end = document.getElementById('vacEnd').value;
+
+            if (!empId || !start || !end) { alert('Bitte alle Felder ausfüllen'); return; }
+
+            vacations.push({ id: Date.now(), empId, start, end });
+            addToHistory('Urlaub hinzugefügt', `${getEmployeeName(empId)}: ${start} - ${end}`);
+            saveData();
+
+            document.getElementById('vacEmployee').value = '';
+            document.getElementById('vacStart').value = '';
+            document.getElementById('vacEnd').value = '';
+
+            updateVacationTable();
+            updateStats();
+        }
+
+        function deleteVacation(id) {
+            vacations = vacations.filter(v => v.id !== id);
+            addToHistory('Urlaub gelöscht', id);
+            saveData();
+            updateVacationTable();
+            updateStats();
+        }
+
+        function updateVacationTable() {
+            const tbody = document.getElementById('vacationTable');
+            tbody.innerHTML = vacations.map(v => {
+                const days = Math.ceil((new Date(v.end) - new Date(v.start)) / (1000 * 60 * 60 * 24)) + 1;
+                return `
+                    <tr>
+                        <td>${getEmployeeName(v.empId)}</td>
+                        <td>${v.start}</td>
+                        <td>${v.end}</td>
+                        <td>${days}</td>
+                        <td><button class="btn-small btn-danger" onclick="deleteVacation(${v.id})">🗑️</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateVacationSelect() {
+            const select = document.getElementById('vacEmployee');
+            select.innerHTML = '<option value="">Mitarbeiter</option>';
+            employees.forEach(e => {
+                select.innerHTML += `<option value="${e.id}">${e.name}</option>`;
+            });
+        }
+
+        function updateTeams() {
+            const depts = [...new Set(employees.map(e => e.dept))];
+            const html = depts.map(dept => {
+                const deptEmps = employees.filter(e => e.dept === dept);
+                const deptShifts = schedules.filter(s => deptEmps.some(e => e.id === s.empId));
+                return `
+                    <div class="card">
+                        <h3>${dept}</h3>
+                        <p><strong>Mitarbeiter:</strong> ${deptEmps.length} | <strong>Schichten:</strong> ${deptShifts.length}</p>
+                        <table>
+                            <tr>
+                                <th>Name</th>
+                                <th>Rolle</th>
+                                <th>Qualifikationen</th>
+                            </tr>
+                            ${deptEmps.map(e => `
+                                <tr>
+                                    <td>${e.name}</td>
+                                    <td>${e.role}</td>
+                                    <td>${e.qual.join(', ')}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('teamsList').innerHTML = html;
+        }
+
+        function addTemplate() {
+            const name = document.getElementById('templateName').value;
+            if (!name) { alert('Name erforderlich'); return; }
+            templates.push({ id: Date.now(), name, freq: document.getElementById('templateFreq').value, shifts: [] });
+            saveData();
+            updateTemplates();
+        }
+
+        function updateTemplates() {
+            const html = templates.map(t => `
+                <div class="card">
+                    <h3>${t.name} (${t.freq})</h3>
+                    <button class="btn-small" onclick="applyTemplate(${t.id})">Anwenden</button>
+                    <button class="btn-small btn-danger" onclick="deleteTemplate(${t.id})">Löschen</button>
+                </div>
+            `).join('');
+            document.getElementById('templatesList').innerHTML = html;
+        }
+
+        function deleteTemplate(id) {
+            templates = templates.filter(t => t.id !== id);
+            saveData();
+            updateTemplates();
+        }
+
+        function applyTemplate(id) {
+            alert('Vorlage anwenden (In Production würde hier die Anwendungslogik kommen)');
+        }
+
+        function saveTemplate() {
+            alert('Vorlage gespeichert');
+        }
+
+        function updateRequests() {
+            const html = requests.length ? requests.map(r => `
+                <div class="card">
+                    <p>${getEmployeeName(r.from)} tauscht mit ${getEmployeeName(r.to)} am ${r.date}</p>
+                    <button class="btn-small" onclick="approveRequest(${r.id})">✓ Genehmigen</button>
+                    <button class="btn-small btn-danger" onclick="rejectRequest(${r.id})">✕ Ablehnen</button>
+                </div>
+            `).join('') : '<p>Keine offenen Anfragen</p>';
+            document.getElementById('requestsList').innerHTML = html;
+        }
+
+        function approveRequest(id) {
+            requests = requests.map(r => r.id === id ? { ...r, status: 'approved' } : r);
+            saveData();
+            updateRequests();
+        }
+
+        function rejectRequest(id) {
+            requests = requests.filter(r => r.id !== id);
+            saveData();
+            updateRequests();
+        }
+
+        function updateReports() {
+            let html = '';
+            employees.forEach(e => {
+                const count = schedules.filter(s => s.empId === e.id).length;
+                const hours = count * 8;
+                const width = Math.min((count / 20) * 100, 100);
+                html += `
+                    <div class="chart-bar">
+                        <span style="width: 150px;">${e.name}</span>
+                        <div class="chart-bar-fill" style="width: ${width}px;">${count}x</div>
+                        <span>${hours}h</span>
+                    </div>
+                `;
+            });
+            document.getElementById('statsEmployee').innerHTML = html;
+
+            const overloaded = employees.filter(e => {
+                const hours = schedules.filter(s => s.empId === e.id).length * 8;
+                return hours > 40;
+            });
+            document.getElementById('overloadList').innerHTML = overloaded.length ? overloaded.map(e => {
+                const hours = schedules.filter(s => s.empId === e.id).length * 8;
+                return `<div class="warning">${e.name}: ${hours}h (Überbelastung!)</div>`;
+            }).join('') : '<p>Keine Überbelastung</p>';
+
+            html = '';
+            ['Früh', 'Spät', 'Nacht'].forEach(shift => {
+                const count = schedules.filter(s => s.shift === shift).length;
+                const width = Math.min((count / 20) * 100, 100);
+                html += `
+                    <div class="chart-bar">
+                        <span style="width: 100px;">${shift}</span>
+                        <div class="chart-bar-fill" style="width: ${width}px;">${count}x</div>
+                    </div>
+                `;
+            });
+            document.getElementById('statsShifts').innerHTML = html;
+
+            html = '<table><tr><th>Name</th><th>Qualifikationen</th></tr>';
+            employees.forEach(e => {
+                html += `<tr><td>${e.name}</td><td>${e.qual.join(', ')}</td></tr>`;
+            });
+            html += '</table>';
+            document.getElementById('skillMatrix').innerHTML = html;
+
+            const trendsHtml = `
+                <p>Beliebte Schichten: ${['Früh', 'Spät', 'Nacht'].map(s => `${s} (${schedules.filter(x => x.shift === s).length})`).join(', ')}</p>
+                <p>Durchschn. Schichten/Mitarbeiter: ${(schedules.length / employees.length).toFixed(1)}</p>
+            `;
+            document.getElementById('trends').innerHTML = trendsHtml;
+        }
+
+        function updateHistory() {
+            const tbody = document.getElementById('historyTable');
+            tbody.innerHTML = history.slice().reverse().slice(0, 100).map(h => `
+                <tr>
+                    <td>${new Date(h.timestamp).toLocaleString('de-DE')}</td>
+                    <td>${h.user}</td>
+                    <td>${h.action}</td>
+                    <td>${h.details}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearHistory() {
+            if (confirm('Wirklich löschen?')) {
+                history = [];
+                saveData();
+                updateHistory();
+            }
+        }
+
+        function openUserModal() {
+            if (currentUser.role !== 'Admin') { alert('Nur Admins'); return; }
+            document.getElementById('userModal').classList.add('active');
+            updateUserList();
+        }
+
+        function addUser() {
+            const name = document.getElementById('userName').value;
+            const role = document.getElementById('userRole').value;
+            if (!name) { alert('Name erforderlich'); return; }
+            users.push({ id: Date.now(), name, role });
+            saveData();
+            updateUserList();
+            document.getElementById('userName').value = '';
+        }
+
+        function updateUserList() {
+            const html = users.map(u => `
+                <div style="padding: 0.5rem; border-bottom: 1px solid #ccc;">
+                    ${u.name} (${u.role})
+                </div>
+            `).join('');
+            document.getElementById('userList').innerHTML = html;
+        }
+
+        function openBackupModal() {
+            document.getElementById('backupModal').classList.add('active');
+        }
+
+        function createBackup() {
+            const backup = {
+                employees, schedules, vacations, templates, requests, history,
+                timestamp: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            document.getElementById('backupInfo').innerHTML = '<div class="success">✓ Backup erstellt</div>';
+        }
+
+        function restoreBackup(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const backup = JSON.parse(ev.target.result);
+                employees = backup.employees;
+                schedules = backup.schedules;
+                vacations = backup.vacations;
+                templates = backup.templates;
+                requests = backup.requests;
+                history = backup.history;
+                saveData();
+                document.getElementById('backupInfo').innerHTML = '<div class="success">✓ Backup wiederhergestellt</div>';
+                location.reload();
+            };
+            reader.readAsText(file);
+        }
+
+        function exportCSV() {
+            let csv = 'Datum,Mitarbeiter,Schicht\n';
+            schedules.forEach(s => {
+                csv += `${s.date},${getEmployeeName(s.empId)},${s.shift}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'schichtplan.csv';
+            a.click();
+        }
+
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function handleCSVImport(e) {
+            alert('CSV-Import verfügbar (Parser könnte hinzugefügt werden)');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        updateEmployeeTable();
+        updateEmployeeSelects();
+        updateFilters();
+        updateCalendar();
+        updateStats();
