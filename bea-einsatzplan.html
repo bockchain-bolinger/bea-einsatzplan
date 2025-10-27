@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bea-Betreuung Einsatzplan</title>
+    <style>
+
+const SUPABASE_URL =https://qpyxxdagltqutgszdpkg.supabase.co; const SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFweXh4ZGFnbHRxdXRnc3pkcGtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NTM1NTYsImV4cCI6MjA3NzEyOTU1Nn0.2RqVEx1BIPfJfRhB7JTQpOkr2pyd8OxjXpiDfbHVu4U;
+
+const { createClient } = supabase; const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+        body.light { background: linear-gradient(135deg, #f0f9fa 0%, #e0f2f1 100%); color: #333; }
+        body.dark { background: #1a1a1a; color: #fff; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1rem; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        h1 { font-size: 2rem; }
+        .subtitle { color: #16a085; font-weight: 600; }
+        .header-controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        button, input, select {
+            padding: 0.5rem 1rem;
+            background: #16a085;
+            color: white;
+            border: none;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        button:hover { background: #0d7e6a; }
+        input, select {
+            background: white;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+        }
+        body.dark input, body.dark select {
+            background: #2a2a2a;
+            color: white;
+            border-color: #555;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 0.4rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #16a085;
+            color: #333;
+        }
+        body.dark .stat-card { background: #2a2a2a; color: white; }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #333;
+        }
+        body.dark .tab-btn { background: #2a2a2a; border-color: #444; color: white; }
+        .tab-btn.active { background: #16a085; color: white; border-color: #16a085; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card {
+            background: white;
+            border-radius: 0.4rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        body.dark .card { background: #2a2a2a; color: white; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        thead { background: #e0f2f1; }
+        body.dark thead { background: #3a3a3a; }
+        th {
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #16a085;
+            cursor: pointer;
+            user-select: none;
+        }
+        th:hover { background: #d0e5e3; }
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        body.dark td { border-bottom-color: #444; }
+        tr:hover { background: #f5f5f5; }
+        body.dark tr:hover { background: #333; }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.3rem;
+            margin: 1rem 0;
+        }
+        .cal-day-header {
+            text-align: center;
+            font-weight: bold;
+            color: #16a085;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .cal-day {
+            min-height: 80px;
+            border: 1px solid #ccc;
+            border-radius: 0.3rem;
+            padding: 0.3rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            font-size: 0.8rem;
+            overflow-y: auto;
+            max-height: 120px;
+            background: white;
+            color: #333;
+        }
+        body.dark .cal-day { border-color: #555; background: #2a2a2a; color: white; }
+        .cal-day:hover { border-color: #16a085; }
+        .cal-date { font-weight: bold; margin-bottom: 0.2rem; }
+        .shift-item {
+            font-size: 0.7rem;
+            padding: 0.2rem;
+            border-radius: 0.2rem;
+            margin-bottom: 0.1rem;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .shift-früh { background: #d4edff; color: #0047b3; }
+        .shift-spät { background: #ffe4cc; color: #cc6600; }
+        .shift-nacht { background: #e8d4f5; color: #6b0095; }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 0.75rem;
+            border-radius: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+            padding: 0.75rem;
+            border-radius: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 0.75rem;
+            border-radius: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 0.75rem;
+            border-radius: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        .btn-small {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+        }
+        .btn-danger {
+            background: #e74c3c;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.4rem;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: #333;
+        }
+        body.dark .modal-content { background: #2a2a2a; color: white; }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            float: right;
+            color: #333;
+        }
+        body.dark .close-btn { color: white; }
+        .filter-section {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .badge {
+            display: inline-block;
+            background: #16a085;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.8rem;
+            margin-right: 0.3rem;
+        }
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .chart-bar-fill {
+            height: 25px;
+            background: #16a085;
+            border-radius: 0.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .login-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.8rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            color: #333;
+        }
+        .login-card h2 {
+            margin-bottom: 1.5rem;
+            color: #16a085;
+        }
+        .login-card input {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        .login-card button {
+            width: 100%;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.4rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+        .notification.error { background: #e74c3c; }
+        .notification.warning { background: #f39c12; }
+        .notification.info { background: #3498db; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #e0f2f1;
+            padding: 0.5rem 1rem;
+            border-radius: 0.4rem;
+        }
+        body.dark .user-info { background: #3a3a3a; }
+        .undo-redo {
+            display: flex;
+            gap: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 0.5rem; }
+            h1 { font-size: 1.5rem; }
+            .calendar { grid-template-columns: repeat(7, 1fr); gap: 0.2rem; }
+            .cal-day { min-height: 60px; font-size: 0.7rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr; }
+            button, input, select { font-size: 0.85rem; padding: 0.4rem 0.8rem; }
+            .notification { right: 10px; left: 10px; }
+        }
+    </style>
+</head>
+<body class="light">
+    <div id="loginContainer" class="login-container" style="display:none;">
+        <div class="login-card">
+            <h2>Bea-Betreuung Einsatzplan</h2>
+            <input type="text" id="loginUser" placeholder="Benutzername" onkeypress="if(event.key==='Enter') login()">
+            <input type="password" id="loginPass" placeholder="Passwort" onkeypress="if(event.key==='Enter') login()">
+            <button onclick="login()">Anmelden</button>
+            <button onclick="showRegister()" style="background: #6c757d; margin-top: 0.5rem;">Registrieren</button>
+        </div>
+    </div>
+
+    <div id="mainApp" style="display:none;">
+        <div class="container">
+            <header>
+                <div>
+                    <h1>Bea-Betreuung Einsatzplan</h1>
+                    <p class="subtitle">Erweiterte Verwaltung & Schichtplanung</p>
+                </div>
+                <div class="user-info" id="userInfo"></div>
+                <div class="header-controls">
+                    <div class="undo-redo">
+                        <button onclick="undo()" title="Rückgängig (Ctrl+Z)">↶ Undo</button>
+                        <button onclick="redo()" title="Wiederherstellen (Ctrl+Y)">↷ Redo</button>
+                    </div>
+                    <button onclick="toggleDarkMode()">🌙</button>
+                    <button onclick="openUserModal()">👤 Benutzer</button>
+                    <button onclick="openBackupModal()">💾 Backup</button>
+                    <button onclick="logout()">🚪 Logout</button>
+                </div>
+            </header>
+
+            <div class="stats" id="statsContainer"></div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('calendar')">📅 Kalender</button>
+                <button class="tab-btn" onclick="switchTab('employees')">👥 Mitarbeiter</button>
+                <button class="tab-btn" onclick="switchTab('teams')">👨‍💼 Teams</button>
+                <button class="tab-btn" onclick="switchTab('absences')">🚫 Abwesenheit</button>
+                <button class="tab-btn" onclick="switchTab('vacations')">🖐️ Urlaub</button>
+                <button class="tab-btn" onclick="switchTab('patterns')">🔄 Schichtmuster</button>
+                <button class="tab-btn" onclick="switchTab('requests')">💬 Tausch-Anfragen</button>
+                <button class="tab-btn" onclick="switchTab('billing')">💰 Abrechnung</button>
+                <button class="tab-btn" onclick="switchTab('reports')">📊 Berichte</button>
+                <button class="tab-btn" onclick="switchTab('history')">📜 Historie</button>
+            </div>
+
+            <div id="calendar" class="tab-content active">
+                <div class="card">
+                    <h2>Schichtplanung</h2>
+                    <div id="conflictWarnings"></div>
+                    <div class="filter-section">
+                        <input type="month" id="monthFilter" value="2025-10" onchange="updateCalendar()">
+                        <select id="deptFilter" onchange="updateCalendar()">
+                            <option value="">Alle Abteilungen</option>
+                        </select>
+                        <button onclick="exportCSV()">⬇️ CSV Export</button>
+                        <button onclick="openImportModal()">⬆️ CSV Import</button>
+                        <button onclick="exportPDF()">📄 PDF Export</button>
+                    </div>
+                    <div id="calendarGrid" class="calendar"></div>
+                    <div class="form-grid" style="margin-top: 1.5rem; border-top: 1px solid #ccc; padding-top: 1rem;">
+                        <input type="date" id="newShiftDate">
+                        <select id="newShiftEmployee"></select>
+                        <select id="newShiftType">
+                            <option value="Früh">Früh</option>
+                            <option value="Spät">Spät</option>
+                            <option value="Nacht">Nacht</option>
+                        </select>
+                        <button onclick="addShift()">➕ Hinzufügen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="employees" class="tab-content">
+                <div class="card">
+                    <h2>Neuer Mitarbeiter</h2>
+                    <div class="form-grid">
+                        <input type="text" id="empName" placeholder="Name">
+                        <input type="text" id="empRole" placeholder="Rolle">
+                        <select id="empDept">
+                            <option value="">Abteilung</option>
+                            <option value="IT">IT</option>
+                            <option value="HR">HR</option>
+                            <option value="Vertrieb">Vertrieb</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                        <input type="text" id="empAvail" placeholder="Verfügbarkeit (z.B. Mo-Fr 8-17)">
+                        <input type="text" id="empQual" placeholder="Qualifikationen (komma-getrennt)">
+                        <input type="number" id="empMaxHours" placeholder="Max Std./Woche" value="40">
+                    </div>
+                    <button onclick="addEmployee()">➕ Hinzufügen</button>
+                </div>
+
+                <div class="card">
+                    <h2>Mitarbeiter</h2>
+                    <div class="filter-section">
+                        <input type="text" id="empSearch" placeholder="Suche..." onkeyup="filterEmployees()">
+                        <select id="empDeptFilter" onchange="filterEmployees()">
+                            <option value="">Alle Abteilungen</option>
+                        </select>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('empTable', 0)">Name</th>
+                                <th onclick="sortTable('empTable', 1)">Rolle</th>
+                                <th onclick="sortTable('empTable', 2)">Abteilung</th>
+                                <th>Qualifikationen</th>
+                                <th>Verfügbarkeit</th>
+                                <th>Schichten</th>
+                                <th>Stunden</th>
+                                <th>Status</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="teams" class="tab-content">
+                <div class="card">
+                    <h2>Abteilungsübersicht</h2>
+                    <div id="teamsList"></div>
+                </div>
+            </div>
+
+            <div id="vacations" class="tab-content">
+                <div class="card">
+                    <h2>Urlaub hinzufügen</h2>
+                    <div class="form-grid">
+                        <select id="vacEmployee"></select>
+                        <input type="date" id="vacStart">
+                        <input type="date" id="vacEnd">
+                    </div>
+                    <button onclick="addVacation()">➕ Urlaub hinzufügen</button>
+                </div>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mitarbeiter</th>
+                                <th>Von</th>
+                                <th>Bis</th>
+                                <th>Tage</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vacationTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="absences" class="tab-content">
+                <div class="card">
+                    <h2>Abwesenheit hinzufügen</h2>
+                    <div class="form-grid">
+                        <select id="absEmployee"></select>
+                        <input type="date" id="absStart">
+                        <input type="date" id="absEnd">
+                        <select id="absType">
+                            <option value="Krank">Krank</option>
+                            <option value="Freizeit">Freizeit</option>
+                            <option value="Schulung">Schulung</option>
+                            <option value="Sonstiges">Sonstiges</option>
+                        </select>
+                    </div>
+                    <button onclick="addAbsence()">➕ Hinzufügen</button>
+                </div>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mitarbeiter</th>
+                                <th>Von</th>
+                                <th>Bis</th>
+                                <th>Typ</th>
+                                <th>Tage</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="absenceTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="patterns" class="tab-content">
+                <div class="card">
+                    <h2>Schichtmuster erstellen</h2>
+                    <div class="form-grid">
+                        <input type="text" id="patternName" placeholder="Mustername (z.B. 3-3-3)">
+                        <input type="text" id="patternCycle" placeholder="Zyklus (z.B. Früh,Früh,Früh,Spät,Spät,Spät,Nacht,Nacht,Nacht,Frei,Frei,Frei)" style="grid-column: span 2;">
+                    </div>
+                    <button onclick="addPattern()">➕ Muster erstellen</button>
+                    <div id="patternsList" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+
+            <div id="billing" class="tab-content">
+                <div class="card">
+                    <h2>Stundenabrechnung</h2>
+                    <div class="filter-section">
+                        <input type="month" id="billingMonth" value="2025-10" onchange="updateBilling()">
+                        <select id="billingDept" onchange="updateBilling()">
+                            <option value="">Alle Abteilungen</option>
+                        </select>
+                        <button onclick="exportBilling()">💾 Als CSV exportieren</button>
+                    </div>
+                    <table style="margin-top: 1rem;">
+                        <thead>
+                            <tr>
+                                <th>Mitarbeiter</th>
+                                <th>Abteilung</th>
+                                <th>Früh</th>
+                                <th>Spät</th>
+                                <th>Nacht</th>
+                                <th>Gesamt</th>
+                                <th>Kosten (8€/h)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="billingTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="requests" class="tab-content">
+                <div class="card">
+                    <h2>Schicht-Tausch-Anfragen</h2>
+                    <div id="requestsList"></div>
+                </div>
+            </div>
+
+            <div id="reports" class="tab-content">
+                <div class="card">
+                    <h2>Schichten pro Mitarbeiter</h2>
+                    <div id="statsEmployee"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Überbelastung (>Max Std./Woche)</h2>
+                    <div id="overloadList"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Verfügbarkeitsauslastung</h2>
+                    <div id="availabilityStats"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Schichten pro Typ</h2>
+                    <div id="statsShifts"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Skill-Matrix & Lücken</h2>
+                    <div id="skillMatrix"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Trend-Analysen</h2>
+                    <div id="trends"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Mindestbesetzung Analyse</h2>
+                    <div id="staffingAnalysis"></div>
+                </div>
+            </div>
+
+            <div id="history" class="tab-content">
+                <div class="card">
+                    <h2>Änderungsverlauf</h2>
+                    <div class="filter-section">
+                        <select id="historyFilter" onchange="updateHistory()">
+                            <option value="">Alle Aktionen</option>
+                            <option value="Schicht">Schicht</option>
+                            <option value="Mitarbeiter">Mitarbeiter</option>
+                            <option value="Urlaub">Urlaub</option>
+                        </select>
+                        <button onclick="clearHistory()">🗑️ Historie löschen</button>
+                    </div>
+                    <table style="margin-top: 1rem;">
+                        <thead>
+                            <tr>
+                                <th>Zeitstempel</th>
+                                <th>Benutzer</th>
+                                <th>Aktion</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="userModal" class="modal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal('userModal')">✕</button>
+                <h2>Benutzer-Verwaltung</h2>
+                <div id="userWarning"></div>
+                <div id="userList" style="margin-top: 1.5rem;"></div>
+            </div>
+        </div>
+
+        <div id="backupModal" class="modal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal('backupModal')">✕</button>
+                <h2>Backup & Restore</h2>
+                <button onclick="createBackup()">💾 Backup erstellen</button>
+                <button onclick="document.getElementById('restoreFile').click()">📂 Backup laden</button>
+                <input type="file" id="restoreFile" accept=".json" onchange="restoreBackup(event)" style="display: none;">
+                <div id="backupInfo" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+
+        <div id="importModal" class="modal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal('importModal')">✕</button>
+                <h2>CSV Importieren</h2>
+                <p>Format: Datum,Mitarbeiter,Schichttyp (Früh/Spät/Nacht)</p>
+                <input type="file" id="csvFile" accept=".csv" onchange="handleCSVImport(event)">
+                <button onclick="document.getElementById('csvFile').click()" style="margin-top: 0.5rem;">📂 Datei wählen</button>
+                <div id="importInfo" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // State Management
+        let currentUser = null;
+        let employees = [];
+        let schedules = [];
+        let vacations = [];
+        let templates = [];
+        let requests = [];
+        let users = [];
+        let history = [];
+        let undoStack = [];
+        let redoStack = [];
+        let appUsers = JSON.parse(localStorage.getItem('appUsers')) || [];
+
+        const ROLES = { 'Admin': 3, 'Manager': 2, 'Mitarbeiter': 1 };
+
+        function loadUserData() {
+            const userData = localStorage.getItem('user_' + currentUser.id);
+            if (userData) {
+                const data = JSON.parse(userData);
+                employees = data.employees || [];
+                schedules = data.schedules || [];
+                vacations = data.vacations || [];
+                absences = data.absences || [];
+                patterns = data.patterns || [];
+                requests = data.requests || [];
+                users = data.users || [];
+                history = data.history || [];
+            } else {
+                employees = [
+                    { id: 1, name: 'Max Müller', role: 'Betreuer', dept: 'IT', qual: ['JavaScript', 'React'], avail: 'Mo-Fr 8-17', maxHours: 40 },
+                    { id: 2, name: 'Anna Schmidt', role: 'Betreuer', dept: 'IT', qual: ['UI/UX'], avail: 'Mo-Fr 9-18', maxHours: 40 }
+                ];
+                schedules = [
+                    { id: 1, date: '2025-10-25', empId: 1, shift: 'Früh' },
+                    { id: 2, date: '2025-10-25', empId: 2, shift: 'Spät' }
+                ];
+                vacations = [];
+                absences = [];
+                patterns = [];
+                requests = [];
+                users = [];
+                history = [];
+            }
+        }
+
+        function saveUserData() {
+            localStorage.setItem('user_' + currentUser.id, JSON.stringify({
+                employees, schedules, vacations, absences, patterns, requests, users, history
+            }));
+        }
+
+        function saveState() {
+            undoStack.push(JSON.stringify({ employees, schedules, vacations, absences, patterns, requests }));
+            redoStack = [];
+            if (undoStack.length > 20) undoStack.shift();
+        }
+
+        function undo() {
+            if (undoStack.length === 0) return;
+            redoStack.push(JSON.stringify({ employees, schedules, vacations, templates, requests }));
+            const state = JSON.parse(undoStack.pop());
+            employees = state.employees;
+            schedules = state.schedules;
+            vacations = state.vacations;
+            templates = state.templates;
+            requests = state.requests;
+            saveUserData();
+            updateAll();
+            notify('Aktion rückgängig gemacht', 'info');
+        }
+
+        function redo() {
+            if (redoStack.length === 0) return;
+            undoStack.push(JSON.stringify({ employees, schedules, vacations, templates, requests }));
+            const state = JSON.parse(redoStack.pop());
+            employees = state.employees;
+            schedules = state.schedules;
+            vacations = state.vacations;
+            templates = state.templates;
+            requests = state.requests;
+            saveUserData();
+            updateAll();
+            notify('Aktion wiederholt', 'info');
+        }
+
+        function notify(msg, type = 'success') {
+            const div = document.createElement('div');
+            div.className = 'notification ' + type;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        function login() {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            if (!user || !pass) { notify('Alle Felder erforderlich', 'error'); return; }
+
+            let foundUser = appUsers.find(u => u.username === user && u.password === pass);
+            if (!foundUser) { notify('Anmeldedaten ungültig', 'error'); return; }
+
+            currentUser = foundUser;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            loadUserData();
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            updateUserInfo();
+            updateAll();
+            notify('Angemeldet als ' + currentUser.username, 'success');
+        }
+
+        function showRegister() {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            if (!user || !pass) { notify('Benutzername und Passwort erforderlich', 'error'); return; }
+            if (appUsers.find(u => u.username === user)) { notify('Benutzer existiert bereits', 'error'); return; }
+
+            const newUser = { id: Date.now(), username: user, password: pass, role: 'Mitarbeiter', email: user + '@example.com' };
+            appUsers.push(newUser);
+            localStorage.setItem('appUsers', JSON.stringify(appUsers));
+            notify('Benutzer registriert. Bitte melden Sie sich an.', 'success');
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+        }
+
+        function logout() {
+            if (confirm('Wirklich abmelden?')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loginContainer').style.display = 'flex';
+                document.getElementById('loginUser').value = '';
+                document.getElementById('loginPass').value = '';
+            }
+        }
+
+        function updateUserInfo() {
+            const hasPermission = currentUser.role === 'Admin' || currentUser.role === 'Manager';
+            const icon = currentUser.role === 'Admin' ? '👑' : currentUser.role === 'Manager' ? '📋' : '👤';
+            document.getElementById('userInfo').innerHTML = `${icon} ${currentUser.username} (${currentUser.role})`;
+        }
+
+        function addToHistory(action, details) {
+            history.push({
+                timestamp: new Date().toISOString(),
+                user: currentUser.username,
+                action,
+                details
+            });
+            if (history.length > 500) history.shift();
+            saveUserData();
+        }
+
+        function canModify() {
+            return currentUser.role === 'Admin' || currentUser.role === 'Manager';
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            document.body.classList.toggle('light');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tab === 'employees') { updateEmployeeTable(); updateFilters(); }
+            if (tab === 'calendar') updateCalendar();
+            if (tab === 'vacations') { updateVacationTable(); updateVacationSelect(); }
+            if (tab === 'teams') updateTeams();
+            if (tab === 'templates') updateTemplates();
+            if (tab === 'requests') updateRequests();
+            if (tab === 'reports') updateReports();
+            if (tab === 'history') updateHistory();
+            updateStats();
+        }
+
+        function updateStats() {
+            const html = `
+                <div class="stat-card"><strong>Mitarbeiter:</strong> ${employees.length}</div>
+                <div class="stat-card"><strong>Schichten:</strong> ${schedules.length}</div>
+                <div class="stat-card"><strong>Urlaube:</strong> ${vacations.length}</div>
+                <div class="stat-card"><strong>Tausch-Anfragen:</strong> ${requests.filter(r => r.status === 'pending').length}</div>
+                <div class="stat-card"><strong>Benutzer:</strong> ${appUsers.length}</div>
+            `;
+            document.getElementById('statsContainer').innerHTML = html;
+        }
+
+        function addEmployee() {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            const name = document.getElementById('empName').value;
+            const role = document.getElementById('empRole').value;
+            const dept = document.getElementById('empDept').value;
+            const avail = document.getElementById('empAvail').value;
+            const qual = document.getElementById('empQual').value.split(',').map(q => q.trim()).filter(q => q);
+            const maxHours = parseInt(document.getElementById('empMaxHours').value) || 40;
+
+            if (!name || !role || !dept) { notify('Pflichtfelder ausfüllen', 'error'); return; }
+
+            saveState();
+            employees.push({ id: Date.now(), name, role, dept, qual, avail, maxHours });
+            addToHistory('Mitarbeiter hinzugefügt', name);
+            saveUserData();
+
+            document.getElementById('empName').value = '';
+            document.getElementById('empRole').value = '';
+            document.getElementById('empQual').value = '';
+            document.getElementById('empAvail').value = '';
+            document.getElementById('empMaxHours').value = '40';
+
+            updateEmployeeTable();
+            updateEmployeeSelects();
+            updateStats();
+            notify('Mitarbeiter hinzugefügt', 'success');
+        }
+
+        function deleteEmployee(id) {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            if (!confirm('Mitarbeiter löschen?')) return;
+            saveState();
+            const name = employees.find(e => e.id === id)?.name;
+            employees = employees.filter(e => e.id !== id);
+            schedules = schedules.filter(s => s.empId !== id);
+            addToHistory('Mitarbeiter gelöscht', name);
+            saveUserData();
+            updateEmployeeTable();
+            updateEmployeeSelects();
+            updateStats();
+        }
+
+        function updateEmployeeTable() {
+            const filtered = employees.filter(e => {
+                const search = document.getElementById('empSearch')?.value.toLowerCase() || '';
+                const dept = document.getElementById('empDeptFilter')?.value || '';
+                return (e.name.toLowerCase().includes(search) || e.role.toLowerCase().includes(search)) &&
+                       (dept === '' || e.dept === dept);
+            });
+
+            const tbody = document.getElementById('employeeTable');
+            tbody.innerHTML = filtered.map(e => {
+                const shifts = schedules.filter(s => s.empId === e.id).length;
+                const hours = shifts * 8;
+                const status = hours > e.maxHours ? '<span class="badge" style="background:#e74c3c">Überbelastet</span>' : hours > e.maxHours * 0.8 ? '<span class="badge" style="background:#f39c12">Warnung</span>' : '<span class="badge">OK</span>';
+                return `
+                    <tr>
+                        <td>${e.name}</td>
+                        <td>${e.role}</td>
+                        <td>${e.dept}</td>
+                        <td>${e.qual.join(', ')}</td>
+                        <td>${e.avail}</td>
+                        <td><span class="badge">${shifts}</span></td>
+                        <td><span class="badge">${hours}/${e.maxHours}h</span></td>
+                        <td>${status}</td>
+                        <td>${canModify() ? '<button class="btn-small btn-danger" onclick="deleteEmployee(' + e.id + ')">🗑️</button>' : ''}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterEmployees() { updateEmployeeTable(); }
+
+        function updateEmployeeSelects() {
+            ['newShiftEmployee', 'vacEmployee'].forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = '<option value="">Mitarbeiter</option>';
+                employees.forEach(e => {
+                    select.innerHTML += `<option value="${e.id}">${e.name}</option>`;
+                });
+            });
+        }
+
+        function updateFilters() {
+            const depts = [...new Set(employees.map(e => e.dept))];
+            document.getElementById('empDeptFilter').innerHTML = '<option value="">Alle</option>' +
+                depts.map(d => `<option value="${d}">${d}</option>`).join('');
+            document.getElementById('deptFilter').innerHTML = '<option value="">Alle</option>' +
+                depts.map(d => `<option value="${d}">${d}</option>`).join('');
+        }
+
+        function addShift() {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            const date = document.getElementById('newShiftDate').value;
+            const empId = parseInt(document.getElementById('newShiftEmployee').value);
+            const shift = document.getElementById('newShiftType').value;
+
+            if (!date || !empId) { notify('Alle Felder ausfüllen', 'error'); return; }
+            if (schedules.some(s => s.date === date && s.empId === empId)) {
+                notify('Doppelbuchung nicht möglich', 'error');
+                return;
+            }
+            if (vacations.some(v => v.empId === empId && date >= v.start && date <= v.end)) {
+                notify('Mitarbeiter ist in Urlaub', 'error');
+                return;
+            }
+
+            const emp = employees.find(e => e.id === empId);
+            const hours = (schedules.filter(s => s.empId === empId).length + 1) * 8;
+            if (hours > emp.maxHours) {
+                notify(`Warnung: ${emp.name} wird überbelastet (${hours}h)`, 'warning');
+            }
+
+            saveState();
+            schedules.push({ id: Date.now(), date, empId, shift });
+            addToHistory('Schicht hinzugefügt', emp.name + ' - ' + date);
+            saveUserData();
+
+            document.getElementById('newShiftDate').value = '';
+            document.getElementById('newShiftEmployee').value = '';
+            updateCalendar();
+            updateStats();
+            notify('Schicht hinzugefügt', 'success');
+        }
+
+        function deleteShift(id) {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            saveState();
+            schedules = schedules.filter(s => s.id !== id);
+            addToHistory('Schicht gelöscht', id);
+            saveUserData();
+            updateCalendar();
+            updateStats();
+        }
+
+        function getEmployeeName(id) {
+            return employees.find(e => e.id == id)?.name || 'Unbekannt';
+        }
+
+        function checkConflicts() {
+            const warnings = [];
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Mindestbesetzung prüfen
+            const staffByDate = {};
+            schedules.forEach(s => {
+                if (s.date >= today) {
+                    staffByDate[s.date] = (staffByDate[s.date] || 0) + 1;
+                }
+            });
+
+            Object.entries(staffByDate).forEach(([date, count]) => {
+                if (count < 2) warnings.push(`⚠️ ${date}: Nur ${count} Betreuer (Min: 2)`);
+            });
+
+            // Überbelastung
+            employees.forEach(e => {
+                const hours = schedules.filter(s => s.empId === e.id).length * 8;
+                if (hours > e.maxHours) {
+                    warnings.push(`⚠️ ${e.name}: ${hours}h (Max: ${e.maxHours}h)`);
+                }
+            });
+
+            return warnings.length ? '<div class="warning">' + warnings.join('<br>') + '</div>' : '';
+        }
+
+        function updateCalendar() {
+            const month = document.getElementById('monthFilter').value;
+            const [year, monthNum] = month.split('-').map(Number);
+            const firstDay = new Date(year, monthNum - 1, 1).getDay();
+            const daysInMonth = new Date(year, monthNum, 0).getDate();
+            const deptFilter = document.getElementById('deptFilter').value;
+
+            document.getElementById('conflictWarnings').innerHTML = checkConflicts();
+
+            let html = '';
+            ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].forEach(day => {
+                html += `<div class="cal-day-header">${day}</div>`;
+            });
+
+            for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
+                html += '<div class="cal-day" style="background: #f5f5f5;"></div>';
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                let daySchedules = schedules.filter(s => s.date === date);
+                if (deptFilter) {
+                    daySchedules = daySchedules.filter(s => employees.find(e => e.id === s.empId)?.dept === deptFilter);
+                }
+                html += `
+                    <div class="cal-day" onclick="selectDate('${date}')">
+                        <div class="cal-date">${day}</div>
+                        ${daySchedules.map(s => `
+                            <div class="shift-item shift-${s.shift.toLowerCase()}" draggable="true" 
+                                ondragstart="dragStart(event, ${s.id})" 
+                                ondrop="dragDrop(event, '${date}')" 
+                                ondragover="dragOver(event)"
+                                onclick="canModify() ? deleteShift(${s.id}) : alert('Keine Berechtigung'); event.stopPropagation();">
+                                ${getEmployeeName(s.empId)} - ${s.shift}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+
+        function selectDate(date) {
+            document.getElementById('newShiftDate').value = date;
+        }
+
+        let draggedShiftId = null;
+        function dragStart(e, id) {
+            if (!canModify()) return;
+            draggedShiftId = id;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function dragDrop(e, date) {
+            if (!canModify()) return;
+            e.preventDefault();
+            if (draggedShiftId) {
+                const shift = schedules.find(s => s.id === draggedShiftId);
+                if (shift) {
+                    saveState();
+                    shift.date = date;
+                    addToHistory('Schicht verschoben', getEmployeeName(shift.empId) + ' zu ' + date);
+                    saveUserData();
+                    updateCalendar();
+                }
+            }
+        }
+
+        function addVacation() {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            const empId = parseInt(document.getElementById('vacEmployee').value);
+            const start = document.getElementById('vacStart').value;
+            const end = document.getElementById('vacEnd').value;
+
+            if (!empId || !start || !end) { notify('Alle Felder ausfüllen', 'error'); return; }
+            if (start > end) { notify('Startdatum muss vor Enddatum liegen', 'error'); return; }
+
+            saveState();
+            vacations.push({ id: Date.now(), empId, start, end });
+            addToHistory('Urlaub hinzugefügt', getEmployeeName(empId) + ': ' + start + ' - ' + end);
+            saveUserData();
+
+            document.getElementById('vacEmployee').value = '';
+            document.getElementById('vacStart').value = '';
+            document.getElementById('vacEnd').value = '';
+
+            updateVacationTable();
+            updateStats();
+            notify('Urlaub hinzugefügt', 'success');
+        }
+
+        function deleteVacation(id) {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            saveState();
+            vacations = vacations.filter(v => v.id !== id);
+            addToHistory('Urlaub gelöscht', id);
+            saveUserData();
+            updateVacationTable();
+            updateStats();
+        }
+
+        function updateVacationTable() {
+            const tbody = document.getElementById('vacationTable');
+            tbody.innerHTML = vacations.map(v => {
+                const days = Math.ceil((new Date(v.end) - new Date(v.start)) / (1000 * 60 * 60 * 24)) + 1;
+                return `
+                    <tr>
+                        <td>${getEmployeeName(v.empId)}</td>
+                        <td>${v.start}</td>
+                        <td>${v.end}</td>
+                        <td>${days}</td>
+                        <td>${canModify() ? '<button class="btn-small btn-danger" onclick="deleteVacation(' + v.id + ')">🗑️</button>' : ''}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateVacationSelect() {
+            const select = document.getElementById('vacEmployee');
+            select.innerHTML = '<option value="">Mitarbeiter</option>';
+            employees.forEach(e => {
+                select.innerHTML += `<option value="${e.id}">${e.name}</option>`;
+            });
+        }
+
+        function updateTeams() {
+            const depts = [...new Set(employees.map(e => e.dept))];
+            const html = depts.map(dept => {
+                const deptEmps = employees.filter(e => e.dept === dept);
+                const deptShifts = schedules.filter(s => deptEmps.some(e => e.id === s.empId));
+                return `
+                    <div class="card">
+                        <h3>${dept}</h3>
+                        <p><strong>Mitarbeiter:</strong> ${deptEmps.length} | <strong>Schichten:</strong> ${deptShifts.length}</p>
+                        <table>
+                            <tr><th>Name</th><th>Rolle</th><th>Qualifikationen</th></tr>
+                            ${deptEmps.map(e => `<tr><td>${e.name}</td><td>${e.role}</td><td>${e.qual.join(', ')}</td></tr>`).join('')}
+                        </table>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('teamsList').innerHTML = html;
+        }
+
+        function addTemplate() {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            const name = document.getElementById('templateName').value;
+            const minStaff = parseInt(document.getElementById('minStaffing').value) || 2;
+            if (!name) { notify('Name erforderlich', 'error'); return; }
+            saveState();
+            templates.push({ id: Date.now(), name, freq: document.getElementById('templateFreq').value, minStaff, shifts: [] });
+            saveUserData();
+            updateTemplates();
+            notify('Vorlage erstellt', 'success');
+        }
+
+        function updateTemplates() {
+            const html = templates.map(t => `
+                <div class="card">
+                    <h3>${t.name} (${t.freq}) - Min: ${t.minStaff}</h3>
+                    <button class="btn-small" onclick="applyTemplate(${t.id})">Anwenden</button>
+                    ${canModify() ? '<button class="btn-small btn-danger" onclick="deleteTemplate(' + t.id + ')">Löschen</button>' : ''}
+                </div>
+            `).join('');
+            document.getElementById('templatesList').innerHTML = html;
+        }
+
+        function deleteTemplate(id) {
+            if (!canModify()) return;
+            saveState();
+            templates = templates.filter(t => t.id !== id);
+            saveUserData();
+            updateTemplates();
+        }
+
+        let absences = [];
+        let patterns = [];
+
+        function addAbsence() {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            const empId = parseInt(document.getElementById('absEmployee').value);
+            const start = document.getElementById('absStart').value;
+            const end = document.getElementById('absEnd').value;
+            const type = document.getElementById('absType').value;
+
+            if (!empId || !start || !end) { notify('Alle Felder ausfüllen', 'error'); return; }
+
+            saveState();
+            absences.push({ id: Date.now(), empId, start, end, type });
+            addToHistory('Abwesenheit hinzugefügt', getEmployeeName(empId) + ' - ' + type);
+            saveUserData();
+            
+            document.getElementById('absEmployee').value = '';
+            document.getElementById('absStart').value = '';
+            document.getElementById('absEnd').value = '';
+
+            updateAbsenceTable();
+            updateStats();
+            notify('Abwesenheit hinzugefügt', 'success');
+        }
+
+        function deleteAbsence(id) {
+            if (!canModify()) return;
+            saveState();
+            absences = absences.filter(a => a.id !== id);
+            saveUserData();
+            updateAbsenceTable();
+        }
+
+        function updateAbsenceTable() {
+            const tbody = document.getElementById('absenceTable');
+            tbody.innerHTML = absences.map(a => {
+                const days = Math.ceil((new Date(a.end) - new Date(a.start)) / (1000 * 60 * 60 * 24)) + 1;
+                return `
+                    <tr>
+                        <td>${getEmployeeName(a.empId)}</td>
+                        <td>${a.start}</td>
+                        <td>${a.end}</td>
+                        <td><span class="badge">${a.type}</span></td>
+                        <td>${days}</td>
+                        <td>${canModify() ? '<button class="btn-small btn-danger" onclick="deleteAbsence(' + a.id + ')">🗑️</button>' : ''}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function addPattern() {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            const name = document.getElementById('patternName').value;
+            const cycle = document.getElementById('patternCycle').value.split(',').map(s => s.trim());
+
+            if (!name || cycle.length === 0) { notify('Name und Zyklus erforderlich', 'error'); return; }
+
+            saveState();
+            patterns.push({ id: Date.now(), name, cycle });
+            saveUserData();
+
+            document.getElementById('patternName').value = '';
+            document.getElementById('patternCycle').value = '';
+
+            updatePatternsList();
+            notify('Schichtmuster erstellt', 'success');
+        }
+
+        function updatePatternsList() {
+            const html = patterns.map(p => `
+                <div class="card">
+                    <h3>${p.name}</h3>
+                    <p>Zyklus: ${p.cycle.join(' → ')}</p>
+                    <button class="btn-small" onclick="applyPatternToEmp(${p.id})">Anwenden</button>
+                    ${canModify() ? '<button class="btn-small btn-danger" onclick="deletePattern(' + p.id + ')">Löschen</button>' : ''}
+                </div>
+            `).join('');
+            document.getElementById('patternsList').innerHTML = html;
+        }
+
+        function deletePattern(id) {
+            if (!canModify()) return;
+            saveState();
+            patterns = patterns.filter(p => p.id !== id);
+            saveUserData();
+            updatePatternsList();
+        }
+
+        function applyPatternToEmp(patternId) {
+            notify('Muster auf Mitarbeiter anwenden (Wählen Sie einen Mitarbeiter aus)', 'info');
+        }
+
+        function updateBilling() {
+            const month = document.getElementById('billingMonth').value;
+            const dept = document.getElementById('billingDept').value;
+            const [year, monthNum] = month.split('-').map(Number);
+
+            const billingData = {};
+            employees.forEach(e => {
+                if (dept && e.dept !== dept) return;
+                
+                const shifts = schedules.filter(s => {
+                    const sDate = new Date(s.date);
+                    return sDate.getFullYear() === year && sDate.getMonth() === monthNum - 1 && s.empId === e.id;
+                });
+
+                const counts = { 'Früh': 0, 'Spät': 0, 'Nacht': 0 };
+                shifts.forEach(s => counts[s.shift]++);
+
+                const total = Object.values(counts).reduce((a, b) => a + b, 0) * 8;
+                const costs = total * 8;
+
+                billingData[e.id] = { name: e.name, dept: e.dept, ...counts, total, costs };
+            });
+
+            const tbody = document.getElementById('billingTable');
+            tbody.innerHTML = Object.values(billingData).map(b => `
+                <tr>
+                    <td>${b.name}</td>
+                    <td>${b.dept}</td>
+                    <td>${b.Früh * 8}h</td>
+                    <td>${b.Spät * 8}h</td>
+                    <td>${b.Nacht * 8}h</td>
+                    <td><strong>${b.total}h</strong></td>
+                    <td><strong>€${b.costs}</strong></td>
+                </tr>
+            `).join('');
+        }
+
+        function exportBilling() {
+            const month = document.getElementById('billingMonth').value;
+            const [year, monthNum] = month.split('-').map(Number);
+            
+            let csv = 'Mitarbeiter,Abteilung,Früh (h),Spät (h),Nacht (h),Gesamt (h),Kosten (€)\n';
+            
+            employees.forEach(e => {
+                const shifts = schedules.filter(s => {
+                    const sDate = new Date(s.date);
+                    return sDate.getFullYear() === year && sDate.getMonth() === monthNum - 1 && s.empId === e.id;
+                });
+
+                const counts = { 'Früh': 0, 'Spät': 0, 'Nacht': 0 };
+                shifts.forEach(s => counts[s.shift]++);
+                
+                const total = Object.values(counts).reduce((a, b) => a + b, 0) * 8;
+                const costs = total * 8;
+
+                csv += `${e.name},${e.dept},${counts.Früh * 8},${counts.Spät * 8},${counts.Nacht * 8},${total},${costs}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `abrechnung_${month}.csv`);
+            link.click();
+            notify('Abrechnung exportiert', 'success');
+        }
+
+        function updateAbsenceSelects() {
+            const select = document.getElementById('absEmployee');
+            select.innerHTML = '<option value="">Mitarbeiter</option>';
+            employees.forEach(e => {
+                select.innerHTML += `<option value="${e.id}">${e.name}</option>`;
+            });
+        }
+
+        function updateRequests() {
+            const html = requests.length ? requests.map(r => `
+                <div class="card">
+                    <p>${getEmployeeName(r.from)} tauscht mit ${getEmployeeName(r.to)} am ${r.date}</p>
+                    ${canModify() ? '<button class="btn-small" onclick="approveRequest(' + r.id + ')">✓ Genehmigen</button><button class="btn-small btn-danger" onclick="rejectRequest(' + r.id + ')">✕ Ablehnen</button>' : '<span class="badge">' + (r.status || 'Ausstehend') + '</span>'}
+                </div>
+            `).join('') : '<p>Keine offenen Anfragen</p>';
+            document.getElementById('requestsList').innerHTML = html;
+        }
+
+        function approveRequest(id) {
+            if (!canModify()) return;
+            saveState();
+            requests = requests.map(r => r.id === id ? { ...r, status: 'approved' } : r);
+            saveUserData();
+            updateRequests();
+            notify('Tausch genehmigt', 'success');
+        }
+
+        function rejectRequest(id) {
+            if (!canModify()) return;
+            saveState();
+            requests = requests.filter(r => r.id !== id);
+            saveUserData();
+            updateRequests();
+            notify('Tausch abgelehnt', 'success');
+        }
+
+        function updateReports() {
+            // Schichten pro Mitarbeiter
+            let html = '';
+            employees.forEach(e => {
+                const count = schedules.filter(s => s.empId === e.id).length;
+                const hours = count * 8;
+                const width = Math.min((count / 20) * 100, 100);
+                html += `<div class="chart-bar"><span style="width: 150px;">${e.name}</span><div class="chart-bar-fill" style="width: ${width}px;">${count}x (${hours}h)</div></div>`;
+            });
+            document.getElementById('statsEmployee').innerHTML = html;
+
+            // Überbelastung
+            const overloaded = employees.filter(e => {
+                const hours = schedules.filter(s => s.empId === e.id).length * 8;
+                return hours > e.maxHours;
+            });
+            document.getElementById('overloadList').innerHTML = overloaded.length ? overloaded.map(e => {
+                const hours = schedules.filter(s => s.empId === e.id).length * 8;
+                return `<div class="warning">${e.name}: ${hours}h (Max: ${e.maxHours}h) - ${hours - e.maxHours}h über Limit</div>`;
+            }).join('') : '<p class="success">✓ Keine Überbelastung</p>';
+
+            // Verfügbarkeitsauslastung
+            let availHtml = '';
+            employees.forEach(e => {
+                const hours = schedules.filter(s => s.empId === e.id).length * 8;
+                const usage = Math.round((hours / e.maxHours) * 100);
+                const color = usage > 100 ? '#e74c3c' : usage > 80 ? '#f39c12' : '#28a745';
+                availHtml += `<div class="chart-bar"><span style="width: 150px;">${e.name}</span><div class="chart-bar-fill" style="width: ${Math.min(usage, 100)}px; background: ${color};">${usage}%</div></div>`;
+            });
+            document.getElementById('availabilityStats').innerHTML = availHtml;
+
+            // Schichten pro Typ
+            html = '';
+            ['Früh', 'Spät', 'Nacht'].forEach(shift => {
+                const count = schedules.filter(s => s.shift === shift).length;
+                const width = Math.min((count / 20) * 100, 100);
+                html += `<div class="chart-bar"><span style="width: 100px;">${shift}</span><div class="chart-bar-fill" style="width: ${width}px;">${count}x</div></div>`;
+            });
+            document.getElementById('statsShifts').innerHTML = html;
+
+            // Skill-Matrix
+            html = '<table><tr><th>Name</th><th>Qualifikationen</th><th>Defizite</th></tr>';
+            employees.forEach(e => {
+                const allSkills = [...new Set(employees.flatMap(x => x.qual))];
+                const missing = allSkills.filter(s => !e.qual.includes(s));
+                html += `<tr><td>${e.name}</td><td>${e.qual.join(', ')}</td><td style="color: #e74c3c;">${missing.slice(0, 3).join(', ')}</td></tr>`;
+            });
+            html += '</table>';
+            document.getElementById('skillMatrix').innerHTML = html;
+
+            // Trends
+            const trendsHtml = `
+                <p>Schichtverteilung: ${['Früh', 'Spät', 'Nacht'].map(s => `${s} (${schedules.filter(x => x.shift === s).length})`).join(', ')}</p>
+                <p>Durchschn. Schichten/Mitarbeiter: ${(schedules.length / (employees.length || 1)).toFixed(1)}</p>
+                <p>Gesamt Stunden/Woche: ${Math.round(schedules.length * 8 / 4.3)}</p>
+            `;
+            document.getElementById('trends').innerHTML = trendsHtml;
+
+            // Mindestbesetzung
+            const staffByDate = {};
+            schedules.forEach(s => {
+                staffByDate[s.date] = (staffByDate[s.date] || 0) + 1;
+            });
+            let staffingHtml = '<table><tr><th>Datum</th><th>Betreuer</th><th>Status</th></tr>';
+            Object.entries(staffByDate).slice(0, 10).forEach(([date, count]) => {
+                const status = count < 2 ? '<span style="color: #e74c3c;">✗ Unterbeset</span>' : '<span style="color: #28a745;">✓ OK</span>';
+                staffingHtml += `<tr><td>${date}</td><td>${count}</td><td>${status}</td></tr>`;
+            });
+            staffingHtml += '</table>';
+            document.getElementById('staffingAnalysis').innerHTML = staffingHtml;
+        }
+
+        function updateHistory() {
+            const filter = document.getElementById('historyFilter')?.value || '';
+            const filtered = filter ? history.filter(h => h.action.includes(filter)) : history;
+            const tbody = document.getElementById('historyTable');
+            tbody.innerHTML = filtered.slice().reverse().slice(0, 100).map(h => `
+                <tr>
+                    <td>${new Date(h.timestamp).toLocaleString('de-DE')}</td>
+                    <td>${h.user}</td>
+                    <td>${h.action}</td>
+                    <td>${h.details}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearHistory() {
+            if (!canModify()) { notify('Keine Berechtigung', 'error'); return; }
+            if (confirm('Historie wirklich löschen?')) {
+                history = [];
+                saveUserData();
+                updateHistory();
+                notify('Historie gelöscht', 'success');
+            }
+        }
+
+        function openUserModal() {
+            if (!canModify()) { notify('Nur Admins', 'error'); return; }
+            document.getElementById('userModal').classList.add('active');
+            updateUserList();
+        }
+
+        function updateUserList() {
+            const html = appUsers.map(u => `
+                <div style="padding: 0.5rem; border-bottom: 1px solid #ccc;">
+                    ${u.username} (${u.role}) ${u.id === currentUser.id ? '(Sie)' : ''}
+                </div>
+            `).join('');
+            document.getElementById('userList').innerHTML = html;
+        }
+
+        function openBackupModal() {
+            document.getElementById('backupModal').classList.add('active');
+        }
+
+        function createBackup() {
+            const backup = { employees, schedules, vacations, templates, requests, history, timestamp: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            notify('Backup erstellt', 'success');
+        }
+
+        function restoreBackup(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const backup = JSON.parse(ev.target.result);
+                    employees = backup.employees;
+                    schedules = backup.schedules;
+                    vacations = backup.vacations;
+                    templates = backup.templates;
+                    requests = backup.requests;
+                    history = backup.history;
+                    saveUserData();
+                    updateAll();
+                    notify('Backup wiederhergestellt', 'success');
+                } catch (err) {
+                    notify('Fehler beim Wiederherstellen', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function handleCSVImport(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const lines = ev.target.result.split('\n').filter(l => l.trim());
+                    if (lines.length < 2) { notify('CSV-Format ungültig', 'error'); return; }
+                    
+                    saveState();
+                    let imported = 0;
+                    lines.slice(1).forEach(line => {
+                        const [date, name, shift] = line.split(',').map(s => s.trim());
+                        if (!date || !name || !shift) return;
+                        
+                        const emp = employees.find(e => e.name.toLowerCase() === name.toLowerCase());
+                        if (!emp) { notify(`Mitarbeiter ${name} nicht gefunden`, 'warning'); return; }
+                        if (!['Früh', 'Spät', 'Nacht'].includes(shift)) { notify(`Unbekannter Schichttyp: ${shift}`, 'warning'); return; }
+                        
+                        if (!schedules.find(s => s.date === date && s.empId === emp.id)) {
+                            schedules.push({ id: Date.now() + imported, date, empId: emp.id, shift });
+                            imported++;
+                        }
+                    });
+                    
+                    addToHistory('CSV Import', `${imported} Schichten importiert`);
+                    saveUserData();
+                    updateCalendar();
+                    updateStats();
+                    document.getElementById('importInfo').innerHTML = `<div class="success">✓ ${imported} Schichten importiert</div>`;
+                    setTimeout(() => closeModal('importModal'), 2000);
+                } catch (err) {
+                    notify('CSV-Fehler: ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportCSV() {
+            let csv = 'Datum,Mitarbeiter,Schift\n';
+            schedules.forEach(s => {
+                csv += `${s.date},${getEmployeeName(s.empId)},${schedules.find(x => x.id === s.id)?.shift}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'schichtplan.csv');
+            link.click();
+            notify('CSV exportiert', 'success');
+        }
+
+        function exportPDF() {
+            const element = document.getElementById('calendarGrid');
+            const opt = {
+                margin: 10,
+                filename: 'schichtplan_' + new Date().toISOString().slice(0, 10) + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+            };
+            html2pdf().set(opt).from(element).save();
+            notify('PDF exportiert', 'success');
+        }
+
+        function sortTable(tableId, col) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                const aVal = a.cells[col].textContent;
+                const bVal = b.cells[col].textContent;
+                return aVal.localeCompare(bVal);
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function updateAll() {
+            updateStats();
+            updateEmployeeTable();
+            updateEmployeeSelects();
+            updateFilters();
+            updateCalendar();
+            updateVacationTable();
+            updateVacationSelect();
+            updateTeams();
+            updateTemplates();
+            updateRequests();
+            updateHistory();
+        }
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z') { e.preventDefault(); undo(); }
+                if (e.key === 'y') { e.preventDefault(); redo(); }
+            }
+        });
+
+        // Initialize
+        const saved = localStorage.getItem('currentUser');
+        if (saved) {
+            currentUser = JSON.parse(saved);
+            loadUserData();
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            updateUserInfo();
+            updateAll();
+        } else {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            
+            // Demo-Benutzer erstellen wenn leer
+            if (appUsers.length === 0) {
+                appUsers = [
+                    { id: 1, username: 'admin', password: 'admin', role: 'Admin', email: 'admin@example.com' },
+                    { id: 2, username: 'manager', password: 'manager', role: 'Manager', email: 'manager@example.com' },
+                    { id: 3, username: 'user', password: 'user', role: 'Mitarbeiter', email: 'user@example.com' }
+                ];
+                localStorage.setItem('appUsers', JSON.stringify(appUsers));
+                document.getElementById('loginUser').placeholder = 'Demo: admin/manager/user';
+            }
+        }
+    </script>
+</body>
+</html>
